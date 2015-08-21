@@ -6,6 +6,19 @@ from jira.client import JIRA as JIRAHandler
 
 class JIRA(JIRAHandler):
 
+    def reportable_sprints(self, board_id, ignored_sprint_ids=()):
+
+        sprints = []
+
+        for sprint in self.sprints(board_id):
+            if sprint.state not in ("ACTIVE", "CLOSED"):
+                continue
+
+            if not ignored_sprint_ids or sprint.id not in ignored_sprint_ids:
+                sprints.append(sprint)
+
+        return sprints
+
     def sprint_report(self, board_id, sprint_id):
         r_json = self._get_json('rapid/charts/sprintreport?rapidViewId=%s&sprintId=%s' % (board_id, sprint_id),
                                 base=self.AGILE_BASE_URL)
@@ -43,19 +56,6 @@ class JIRA(JIRAHandler):
                       added=added,
                       punted=punted,
                       all=all)
-
-    def reportable_sprints(self, board_id, ignored_sprint_ids=()):
-
-        sprints = []
-
-        for sprint in self.sprints(board_id):
-            if sprint.state not in ("ACTIVE", "CLOSED"):
-                continue
-
-            if not ignored_sprint_ids or sprint.id not in ignored_sprint_ids:
-                sprints.append(sprint)
-
-        return sprints
 
 
 def connect(server, username, password):
