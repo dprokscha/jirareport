@@ -55,6 +55,8 @@ class Burndown():
             if 'Story' != self.issues[key].fields.issuetype.name:
                 continue
 
+            status = 'Open'
+
             for history in self.issues[key].changelog.histories:
                 for item in history.items:
 
@@ -62,12 +64,18 @@ class Burndown():
                     if not (self.start <= created <= self.end):
                         continue
 
+                    if 'status' == item.field:
+                        status = item.toString
+
+                    if 'Open' == status:
+                        continue
+
                     if 'Story Points' == item.field and item.fromString is not None:
 
                         diff = int(item.toString) - int(item.fromString)
                         if diff > 0:
                             continue
-
+                        print('%s - %s' % (key, diff))
                         change = created.strftime('%Y-%m-%d')
                         if change not in changes:
                             changes[change] = 0
