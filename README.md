@@ -17,7 +17,7 @@ Run ``pip install -r requirements.txt`` to install all dependencies.
 * ``-i, --ignore_sprint`` Sprint ID which is ignored for the reports.
 
 ### Commands
-``burndown PATH``
+``burndown PATH`` 
 Creates a burndown chart from the chosen sprint. The generated SVG file will be written to ``PATH``.
 
 ### License
