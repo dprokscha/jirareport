@@ -118,10 +118,14 @@ class Burndown():
 
                     if 'Story Points' == item.field and item.fromString is not None:
 
+                        diff = int(item.toString) - int(item.fromString)
+                        if diff > 0:
+                            continue
+
                         change = created.strftime('%Y-%m-%d')
                         if change not in changes:
                             changes[change] = 0
-                        changes[change] += int(item.toString) - int(item.fromString)
+                        changes[change] += diff
 
         for date, entry in self.timeline.items():
             if date in changes:
