@@ -75,7 +75,7 @@ class Burndown():
                         diff = int(item.toString) - int(item.fromString)
                         if diff > 0:
                             continue
-                        print('%s - %s' % (key, diff))
+                        print('completed: %s - %s' % (key, diff))
                         change = created.strftime('%Y-%m-%d')
                         if change not in changes:
                             changes[change] = 0
@@ -136,11 +136,13 @@ class Burndown():
                     changes[change] = 0
                 changes[change] -= estimation
 
-        # increased story points
+        # decreased/increased story points
         for key in self.report.all:
 
             if 'Story' != self.issues[key].fields.issuetype.name:
                 continue
+
+            status = 'Open'
 
             for history in self.issues[key].changelog.histories:
                 for item in history.items:
@@ -149,12 +151,15 @@ class Burndown():
                     if not (self.start <= created <= self.end):
                         continue
 
+                    if 'status' == item.field:
+                        status = item.toString
+
                     if 'Story Points' == item.field and item.fromString is not None:
 
                         diff = int(item.toString) - int(item.fromString)
-                        if diff < 0:
+                        if 'Open' != status and diff < 0:
                             continue
-
+                        print('unplanned: %s - %s' % (key, diff))
                         change = created.strftime('%Y-%m-%d')
                         if change not in changes:
                             changes[change] = 0
