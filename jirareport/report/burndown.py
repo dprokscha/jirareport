@@ -103,7 +103,7 @@ class Burndown():
                     changes[change] = 0
                 changes[change] -= estimation
 
-        # changed
+        # increased story points
         for key in self.report.all:
 
             if 'Story' != self.issues[key].fields.issuetype.name:
