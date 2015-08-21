@@ -75,7 +75,7 @@ class Burndown():
                         diff = int(item.toString) - int(item.fromString)
                         if diff > 0:
                             continue
-                        print('completed: %s - %s' % (key, diff))
+
                         change = created.strftime('%Y-%m-%d')
                         if change not in changes:
                             changes[change] = 0
@@ -159,7 +159,7 @@ class Burndown():
                         diff = int(item.toString) - int(item.fromString)
                         if 'Open' != status and diff < 0:
                             continue
-                        print('unplanned: %s - %s' % (key, diff))
+
                         change = created.strftime('%Y-%m-%d')
                         if change not in changes:
                             changes[change] = 0
