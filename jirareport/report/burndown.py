@@ -35,6 +35,7 @@ class Burndown():
         changes = {}
         completed = self.commitment
 
+        # closed issues
         for key in self.report.completed:
 
             if 'Story' != self.issues[key].fields.issuetype.name:
@@ -47,6 +48,30 @@ class Burndown():
             if date not in changes:
                 changes[date] = 0
             changes[date] += int(self.issues[key].fields.customfield_10002)
+
+        # decreased story points
+        for key in self.report.all:
+
+            if 'Story' != self.issues[key].fields.issuetype.name:
+                continue
+
+            for history in self.issues[key].changelog.histories:
+                for item in history.items:
+
+                    created = datetime.datetime.strptime(re.sub(r'\..*$', '', history.created), '%Y-%m-%dT%H:%M:%S')
+                    if not (self.start <= created <= self.end):
+                        continue
+
+                    if 'Story Points' == item.field and item.fromString is not None:
+
+                        diff = int(item.toString) - int(item.fromString)
+                        if diff > 0:
+                            continue
+
+                        change = created.strftime('%Y-%m-%d')
+                        if change not in changes:
+                            changes[change] = 0
+                        changes[change] += abs(diff)
 
         for date, entry in self.timeline.items():
             if date in changes:
