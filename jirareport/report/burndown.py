@@ -119,7 +119,7 @@ class Burndown():
                     if 'Story Points' == item.field and item.fromString is not None:
 
                         diff = int(item.toString) - int(item.fromString)
-                        if diff > 0:
+                        if diff < 0:
                             continue
 
                         change = created.strftime('%Y-%m-%d')
