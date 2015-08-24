@@ -15,7 +15,7 @@ Run ``pip install -r requirements.txt`` to install all dependencies.
 ``-p, --password TEXT`` Password to log into JIRA.
 
 ### Commands
-``burndown PATH``  
+``burndown PATH`` [Example SVG](https://github.com/dprokscha/jirareport/blob/master/examples/burndown.svg)  
 Creates a burndown chart from the chosen sprint. The generated SVG file will be written to ``PATH``. The green line *Completed* shows all completed issues. Completed means the issue status is *Done* or the estimation of issues decreased while the issue status was not *Open*. The red line *Unplanned* shows all unplanned issues. The line increases if issues were added or the estimation of issues increased during a sprint. It decreases if issues were removed or the estimation decreased (only if issue status is *Open*). A sprint seems to be healthy, if the line never goes up or down. 
 
 ### License
