@@ -10,8 +10,8 @@ Run ``pip install -r requirements.txt`` to install all dependencies.
 ``jirareport.py [OPTIONS] COMMAND [ARGS]``
 
 ### Options
-``-s, --server TEXT`` URL to JIRA server.
-``-u, --user TEXT`` Username to log into JIRA.
+``-s, --server TEXT`` URL to JIRA server.  
+``-u, --user TEXT`` Username to log into JIRA.  
 ``-p, --password TEXT`` Password to log into JIRA.
 
 ### Commands
