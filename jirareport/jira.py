@@ -6,7 +6,7 @@ from jira.client import JIRA as JIRAHandler
 
 class JIRA(JIRAHandler):
 
-    def reportable_sprints(self, board_id, ignored_sprint_ids=()):
+    def reportable_sprints(self, board_id):
 
         sprints = []
 
@@ -14,8 +14,7 @@ class JIRA(JIRAHandler):
             if sprint.state not in ("ACTIVE", "CLOSED"):
                 continue
 
-            if not ignored_sprint_ids or sprint.id not in ignored_sprint_ids:
-                sprints.append(sprint)
+            sprints.append(sprint)
 
         return sprints
 
