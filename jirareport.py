@@ -44,7 +44,7 @@ def burndown(ctx, output=None):
         click.echo('There are no active or closed sprints for the given board ID %s.' % board)
         return
 
-    click.echo('OK')
+    click.echo(click.style('OK', fg='green'))
 
     ids = []
     for sprint in sprints:
@@ -66,7 +66,7 @@ def burndown(ctx, output=None):
         click.echo('Nothing found for sprint ID %s' % id)
         return
 
-    click.echo('OK')
+    click.echo(click.style('OK', fg='green'))
 
     issues = {}
 
@@ -104,7 +104,7 @@ def burndown(ctx, output=None):
     chart.value_formatter = lambda x: "%d" % x
     output.write(chart.render())
 
-    click.echo('Done')
+    click.echo('Done!')
 
 
 if __name__ == '__main__':
