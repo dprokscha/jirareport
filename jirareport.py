@@ -33,24 +33,29 @@ def burndown(ctx, output=None):
 
     board = click.prompt('Enter board ID', type=click.INT)
 
-    click.echo('Fetching sprints: ', nl=False)
+    click.echo('Verifying board ID: ', nl=False)
 
-    sprints = jira.reportable_sprints(board)
+    reportable = jira.reportable_sprints(board)
 
-    if not sprints:
+    if not reportable:
         click.echo('There are no active or closed sprints for the given board ID %s.' % board)
         return
 
     click.secho('OK', fg='green')
 
-    ids = []
-    for sprint in sprints:
-        click.echo('ID: %s, Name: %s' % (sprint.id, sprint.name))
-        ids.append(sprint.id)
+    details = []
+    with click.progressbar(reportable, bar_template='%(label)s [%(bar)s] %(info)s', label='Fetching sprints:', show_eta=False) as sprints:
+        for sprint in sprints:
+            details.append(jira.sprint_details(board, sprint.id))
+
+    details.sort(key=lambda sprint: sprint['startDate'])
+
+    for sprint in details:
+        click.echo('ID %s, Created: %s, Name: %s' % (sprint['id'], sprint['startDate'].strftime('%Y-%m-%d'), sprint['name']))
 
     while True:
         id = click.prompt('Enter sprint ID', type=click.INT)
-        if id in ids:
+        if any(sprint['id'] == id for sprint in details):
             break
         click.echo('Invalid sprint ID %s' % id)
 
