@@ -71,7 +71,6 @@ def burndown(ctx, output=None):
     click.secho('OK', fg='green')
 
     issues = {}
-
     with click.progressbar(report.all, bar_template='%(label)s [%(bar)s] %(info)s', label='Fetching issues:', show_eta=False) as all:
         for key in all:
             issues[key] = jira.issue(key, expand='changelog')
