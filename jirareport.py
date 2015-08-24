@@ -8,10 +8,6 @@ import jirareport.jira
 import jirareport.report
 
 
-def path():
-    return os.path.dirname(os.path.realpath(__file__))
-
-
 @click.group()
 @click.option('--server', '-s', help='URL to JIRA server.', prompt=True, type=click.STRING)
 @click.option('--username', '-u', help='Username to log into JIRA.', prompt=True, type=click.STRING)
