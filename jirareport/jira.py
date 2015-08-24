@@ -19,6 +19,7 @@ class JIRA(JIRAHandler):
         return sprints
 
     def sprint_report(self, board_id, sprint_id):
+
         r_json = self._get_json('rapid/charts/sprintreport?rapidViewId=%s&sprintId=%s' % (board_id, sprint_id),
                                 base=self.AGILE_BASE_URL)
 
@@ -58,6 +59,7 @@ class JIRA(JIRAHandler):
 
 
 def connect(server, username, password):
+
     try:
         jira = JIRA(basic_auth=(username, password),
                     options={'server': server})
