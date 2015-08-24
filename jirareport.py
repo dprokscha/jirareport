@@ -24,7 +24,7 @@ def main(ctx, server, username, password, board, ignore_sprint):
     jira = jirareport.jira.connect(server, username, password)
 
     if not jira:
-        print('Connection to %s failed' % server)
+        click.echo('Connection to %s failed' % server, err=True)
         exit(1)
 
     obj = collections.namedtuple('Shared', 'jira board ignore_sprint')
@@ -36,7 +36,7 @@ def main(ctx, server, username, password, board, ignore_sprint):
 @click.pass_context
 def burndown(ctx, output=None):
 
-    print('Fetching sprints: ', end='', flush=True)
+    click.echo('Fetching sprints: ', nl=False)
 
     jira = ctx.obj.jira
     board = ctx.obj.board
@@ -45,32 +45,32 @@ def burndown(ctx, output=None):
     sprints = jira.reportable_sprints(board, ignore_sprint)
 
     if not sprints:
-        print('There are no active or closed sprints for the given board ID %s.' % board)
+        click.echo('There are no active or closed sprints for the given board ID %s.' % board)
         return
 
-    print('OK')
+    click.echo('OK')
 
     ids = []
     for sprint in sprints:
-        print('ID: %s, Name: %s' % (sprint.id, sprint.name))
+        click.echo('ID: %s, Name: %s' % (sprint.id, sprint.name))
         ids.append(sprint.id)
 
     while True:
         id = click.prompt('Enter sprint ID', type=click.INT)
         if id in ids:
             break
-        print('Invalid sprint ID %s' % id)
+        click.echo('Invalid sprint ID %s' % id)
 
-    print('Fetching sprint report: ', end='', flush=True)
+    click.echo('Fetching sprint report: ', nl=False)
 
     sprint = jira.sprint_info(board, id)
     report = jira.sprint_report(board, id)
 
     if not sprint or not report or not report.all:
-        print('Nothing found for sprint ID %s' % id)
+        click.echo('Nothing found for sprint ID %s' % id)
         return
 
-    print('OK')
+    click.echo('OK')
 
     issues = {}
 
@@ -82,7 +82,7 @@ def burndown(ctx, output=None):
     burndown = jirareport.report.Burndown(sprint, commitment, report, issues)
     timeline = burndown.get_timeline()
 
-    print('Writing SVG to %s' % output.name)
+    click.echo('Writing SVG to %s' % output.name)
 
     style = pygal.style.Style(
         background='transparent',
@@ -108,7 +108,7 @@ def burndown(ctx, output=None):
     chart.value_formatter = lambda x: "%d" % x
     output.write(chart.render())
 
-    print('Done')
+    click.echo('Done')
 
 
 if __name__ == '__main__':
