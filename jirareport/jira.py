@@ -1,4 +1,5 @@
 import collections
+import datetime
 import json
 
 from jira.client import JIRA as JIRAHandler
@@ -17,6 +18,16 @@ class JIRA(JIRAHandler):
             sprints.append(sprint)
 
         return sprints
+
+    def sprint_details(self, board_id, sprint_id):
+
+        r_json = self._get_json('rapid/charts/sprintreport?rapidViewId=%s&sprintId=%s' % (board_id, sprint_id),
+                                base=self.AGILE_BASE_URL)
+
+        r_json['sprint']['startDate'] = datetime.datetime.strptime(r_json['sprint']['startDate'], '%d/%b/%y %I:%M %p')
+        r_json['sprint']['endDate'] = datetime.datetime.strptime(r_json['sprint']['endDate'], '%d/%b/%y %I:%M %p')
+
+        return r_json['sprint']
 
     def sprint_report(self, board_id, sprint_id):
 
