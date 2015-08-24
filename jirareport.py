@@ -46,7 +46,7 @@ def burndown(ctx, output=None):
     details = []
     with click.progressbar(reportable, bar_template='%(label)s [%(bar)s] %(info)s', label='Fetching sprints:', show_eta=False) as sprints:
         for sprint in sprints:
-            details.append(jira.sprint_details(board, sprint.id))
+            details.append(jira.get_sprint(board, sprint.id))
 
     details.sort(key=lambda sprint: sprint['startDate'])
 
