@@ -41,7 +41,7 @@ def burndown(ctx, output=None):
         click.echo('There are no active or closed sprints for the given board ID %s.' % board)
         return
 
-    click.echo(click.style('OK', fg='green'))
+    click.secho('OK', fg='green')
 
     ids = []
     for sprint in sprints:
@@ -63,7 +63,7 @@ def burndown(ctx, output=None):
         click.echo('Nothing found for sprint ID %s' % id)
         return
 
-    click.echo(click.style('OK', fg='green'))
+    click.secho('OK', fg='green')
 
     issues = {}
 
