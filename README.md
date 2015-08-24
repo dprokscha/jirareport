@@ -13,8 +13,6 @@ Run ``pip install -r requirements.txt`` to install all dependencies.
 * ``-s, --server TEXT`` URL to JIRA server.
 * ``-u, --user TEXT`` Username to log into JIRA.
 * ``-p, --password TEXT`` Password to log into JIRA.
-* ``-b, --board INTEGER`` JIRA board ID to read the sprints from.
-* ``-i, --ignore_sprint`` Sprint ID which is ignored for the reports.
 
 ### Commands
 ``burndown PATH``  

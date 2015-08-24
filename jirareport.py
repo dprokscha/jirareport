@@ -12,10 +12,8 @@ import jirareport.report
 @click.option('--server', '-s', help='URL to JIRA server.', prompt=True, type=click.STRING)
 @click.option('--username', '-u', help='Username to log into JIRA.', prompt=True, type=click.STRING)
 @click.option('--password', '-p', help='Password to log into JIRA.', prompt=True, hide_input=True)
-@click.option('--board', '-b', help='JIRA board ID to read the sprints from.', prompt=True, type=click.INT)
-@click.option('--ignore_sprint', '-i', help='Sprint ID which is ignored for the reports.', multiple=True, type=click.INT)
 @click.pass_context
-def main(ctx, server, username, password, board, ignore_sprint):
+def main(ctx, server, username, password):
 
     jira = jirareport.jira.connect(server, username, password)
 
@@ -23,8 +21,7 @@ def main(ctx, server, username, password, board, ignore_sprint):
         click.echo('Connection to %s failed' % server, err=True)
         exit(1)
 
-    obj = collections.namedtuple('Shared', 'jira board ignore_sprint')
-    ctx.obj = obj(jira=jira, board=board, ignore_sprint=ignore_sprint)
+    ctx.obj = jira
 
 
 @main.command()
@@ -32,13 +29,13 @@ def main(ctx, server, username, password, board, ignore_sprint):
 @click.pass_context
 def burndown(ctx, output=None):
 
+    jira = ctx.obj
+
+    board = click.prompt('Enter board ID', type=click.INT)
+
     click.echo('Fetching sprints: ', nl=False)
 
-    jira = ctx.obj.jira
-    board = ctx.obj.board
-    ignore_sprint = ctx.obj.ignore_sprint
-
-    sprints = jira.reportable_sprints(board, ignore_sprint)
+    sprints = jira.reportable_sprints(board)
 
     if not sprints:
         click.echo('There are no active or closed sprints for the given board ID %s.' % board)
