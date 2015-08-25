@@ -1,5 +1,4 @@
 import collections
-import os
 
 import click
 import pygal
@@ -12,8 +11,9 @@ import jirareport.report
 @click.option('--server', '-s', help='URL to JIRA server.', prompt=True, type=click.STRING)
 @click.option('--username', '-u', help='Username to log into JIRA.', prompt=True, type=click.STRING)
 @click.option('--password', '-p', help='Password to log into JIRA.', prompt=True, hide_input=True)
+@click.option('--customfield', '-c', help='JIRA internal field name for issue estimation.', prompt=True, type=click.STRING)
 @click.pass_context
-def main(ctx, server, username, password):
+def main(ctx, server, username, password, customfield):
 
     jira = jirareport.jira.connect(server, username, password)
 
@@ -21,7 +21,8 @@ def main(ctx, server, username, password):
         click.echo('Connection to %s failed' % server, err=True)
         exit(1)
 
-    ctx.obj = jira
+    obj = collections.namedtuple('Context', 'jira customfield')
+    ctx.obj = obj(jira=jira, customfield=customfield)
 
 
 @main.command()
@@ -29,7 +30,8 @@ def main(ctx, server, username, password):
 @click.pass_context
 def burndown(ctx, output=None):
 
-    jira = ctx.obj
+    jira = ctx.obj.jira
+    customfield = ctx.obj.customfield
 
     board = click.prompt('Enter board ID', type=click.INT)
 
@@ -76,7 +78,7 @@ def burndown(ctx, output=None):
             issues[key] = jira.issue(key, expand='changelog')
 
     commitment = click.prompt('Enter commitment', type=click.INT)
-    burndown = jirareport.report.Burndown(sprint, commitment, report, issues)
+    burndown = jirareport.report.Burndown(sprint, commitment, report, issues, customfield)
     timeline = burndown.get_timeline()
 
     click.echo('Writing SVG to %s' % output.name)

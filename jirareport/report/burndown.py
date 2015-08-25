@@ -5,13 +5,14 @@ import re
 
 class Burndown():
 
-    def __init__(self, sprint, commitment, report, issues):
+    def __init__(self, sprint, commitment, report, issues, customfield):
 
         self.sprint = sprint
         self.commitment = commitment
         self.report = report
         self.issues = issues
         self.timeline = collections.OrderedDict()
+        self.customfield = customfield
 
         self.start = datetime.datetime.strptime(sprint['startDate'], '%d/%b/%y %I:%M %p')
         self.end = datetime.datetime.strptime(sprint['endDate'], '%d/%b/%y %I:%M %p')
@@ -47,7 +48,7 @@ class Burndown():
 
             if date not in changes:
                 changes[date] = 0
-            changes[date] += int(self.issues[key].fields.customfield_10002)
+            changes[date] += int(getattr(self.issues[key].fields, self.customfield))
 
         # decreased story points
         for key in self.report.all:
@@ -112,7 +113,7 @@ class Burndown():
 
                 estimation = self._get_estimation_from_date(date, self.issues[key].changelog.histories)
                 if estimation is None:
-                    estimation = int(self.issues[key].fields.customfield_10002)
+                    estimation = int(getattr(self.issues[key].fields, self.customfield))
 
                 change = date.strftime('%Y-%m-%d')
                 if change not in changes:
@@ -129,7 +130,7 @@ class Burndown():
 
                 estimation = self._get_estimation_from_date(date, self.issues[key].changelog.histories)
                 if estimation is None:
-                    estimation = int(self.issues[key].fields.customfield_10002)
+                    estimation = int(getattr(self.issues[key].fields, self.customfield))
 
                 change = date.strftime('%Y-%m-%d')
                 if change not in changes:
