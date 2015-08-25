@@ -42,13 +42,14 @@ class Burndown():
             if 'Story' != self.issues[key].fields.issuetype.name:
                 continue
 
-            date = self._get_resolution_date(self.issues[key].changelog.histories)
-            if not date:
+            resolution = self._get_resolution_date(self.issues[key].changelog.histories)
+            if not self.start <= resolution <= self.end:
                 continue
 
-            if date not in changes:
-                changes[date] = 0
-            changes[date] += int(getattr(self.issues[key].fields, self.customfield))
+            change = resolution.strftime('%Y-%m-%d')
+            if change not in changes:
+                changes[change] = 0
+            changes[change] += int(getattr(self.issues[key].fields, self.customfield))
 
         # decreased story points
         for key in self.report.all:
@@ -127,6 +128,10 @@ class Burndown():
                 continue
 
             for date in self._get_punted_dates(self.issues[key].changelog.histories):
+
+                resolution = self._get_resolution_date(self.issues[key].changelog.histories)
+                if not self.start <= resolution <= self.end:
+                    continue
 
                 estimation = self._get_estimation_from_date(date, self.issues[key].changelog.histories)
                 if estimation is None:
@@ -231,9 +236,7 @@ class Burndown():
             for item in history.items:
 
                 if 'resolution' == item.field and 'Done' == item.toString:
-                    created = datetime.datetime.strptime(re.sub(r'\..*$', '', history.created), '%Y-%m-%dT%H:%M:%S')
-                    if self.start <= created <= self.end:
-                        return created.strftime('%Y-%m-%d')
+                    return datetime.datetime.strptime(re.sub(r'\..*$', '', history.created), '%Y-%m-%dT%H:%M:%S')
 
     def calculate(self):
 
