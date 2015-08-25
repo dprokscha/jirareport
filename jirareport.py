@@ -37,7 +37,11 @@ def burndown(ctx, output=None):
 
     click.echo('Verifying board ID: ', nl=False)
 
-    reportable = jira.reportable_sprints(board)
+    try:
+        reportable = jira.reportable_sprints(board)
+
+    except Exception:
+        reportable = None
 
     if not reportable:
         click.echo('There are no active or closed sprints for the given board ID %s.' % board)
