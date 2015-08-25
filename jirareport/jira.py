@@ -1,6 +1,5 @@
 import collections
 import datetime
-import json
 import re
 
 from jira.client import JIRA as JIRAHandler
