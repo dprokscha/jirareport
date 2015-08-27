@@ -225,7 +225,17 @@ class Burndown():
                 if not (self.start <= created <= self.end):
                     continue
 
-                if 'Sprint' == item.field and str(self.sprint['id']) not in item.to:
+                if 'Sprint' != item.field and str(self.sprint['id']):
+                    continue
+
+                current_sprint = str(self.sprint['id'])
+                from_sprint = str(getattr(item, 'from'))
+                to_sprint = str(getattr(item, 'to'))
+
+                if from_sprint and current_sprint not in from_sprint:
+                    continue
+
+                if current_sprint not in to_sprint:
                     dates.append(created)
 
         return dates
