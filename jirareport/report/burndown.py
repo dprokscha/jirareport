@@ -130,7 +130,7 @@ class Burndown():
             for date in self._get_punted_dates(self.issues[key].changelog.histories):
 
                 resolution = self._get_resolution_date(self.issues[key].changelog.histories)
-                if not self.start <= resolution <= self.end:
+                if resolution and not self.start <= resolution <= self.end:
                     continue
 
                 estimation = self._get_estimation_from_date(date, self.issues[key].changelog.histories)
