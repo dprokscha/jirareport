@@ -142,5 +142,38 @@ def burndown(ctx, output=None):
     click.echo('Done!')
 
 
+@main.command()
+@click.pass_context
+def dailybusiness(ctx):
+
+    jira = ctx.obj.jira
+
+    key = click.prompt('Enter issue key', type=click.STRING)
+
+    try:
+        issue = jira.issue(key)
+
+    except Exception:
+        click.echo('Issue not found: %s' % key, err=True)
+        exit(1)
+
+    length = 0
+    while length <= 0:
+        length = click.prompt('Enter sprint length', type=click.INT)
+
+        if length <= 0:
+            click.echo('Error: Invalid sprint length')
+
+    dailybusiness = jirareport.report.dailybusiness.analyse(issue.fields.comment.comments)
+    average = jirareport.report.dailybusiness.average(length, dailybusiness['hours'], dailybusiness['minutes'])
+
+    click.echo('Found %dh %dm of daily business. Average per day: %dh %dm' % (dailybusiness['hours'],
+                                                                              dailybusiness['minutes'],
+                                                                              average['hours'],
+                                                                              average['minutes']))
+
+    click.echo('Done!')
+
+
 if __name__ == '__main__':
     main()
