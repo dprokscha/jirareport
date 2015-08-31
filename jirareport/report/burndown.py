@@ -49,7 +49,7 @@ class Burndown():
             change = resolution.strftime('%Y-%m-%d')
             if change not in changes:
                 changes[change] = 0
-            changes[change] += int(getattr(self.issues[key].fields, self.customfield))
+            changes[change] += int(getattr(self.issues[key].fields, self.customfield, 0))
 
         # decreased story points
         for key in self.report.all:
@@ -114,7 +114,7 @@ class Burndown():
 
                 estimation = self._get_estimation_from_date(date, self.issues[key].changelog.histories)
                 if estimation is None:
-                    estimation = int(getattr(self.issues[key].fields, self.customfield))
+                    estimation = int(getattr(self.issues[key].fields, self.customfield, 0))
 
                 change = date.strftime('%Y-%m-%d')
                 if change not in changes:
@@ -135,7 +135,7 @@ class Burndown():
 
                 estimation = self._get_estimation_from_date(date, self.issues[key].changelog.histories)
                 if estimation is None:
-                    estimation = int(getattr(self.issues[key].fields, self.customfield))
+                    estimation = int(getattr(self.issues[key].fields, self.customfield, 0))
 
                 change = date.strftime('%Y-%m-%d')
                 if change not in changes:
