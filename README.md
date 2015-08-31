@@ -21,7 +21,7 @@ The script automatically prompts for omitted but required options (like password
 ``burndown PATH`` ([example](https://github.com/dprokscha/jirareport/blob/master/examples/burndown.svg))  
 Creates a burndown chart from the chosen sprint. The generated SVG file will be written to ``PATH``. The green line *Completed* shows all completed issues. Completed means the issue status is *Done* or the estimation of issues decreased while the issue status was not *Open*. The red line *Unplanned* shows all unplanned issues. The line increases if issues were added or the estimation of issues increased during a sprint. It decreases if issues were removed or the estimation decreased (only if issue status is *Open*). A sprint seems to be healthy, if the line never goes up or down. 
 
-``dailybusiness``
+``dailybusiness``  
 Analysis all comments of the given issue for time tracks like and sums them. The format of a valid time track is ``[..h..m]`` (e.g. ``[5h35m]``). This can be used by all developers who wants to track their "Hey Joe!" tasks in a single issue by time.
 
 ### Example
