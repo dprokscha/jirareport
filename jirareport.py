@@ -112,7 +112,9 @@ def burndown(ctx, output=None):
     commitment = click.prompt('Enter commitment', type=click.INT)
     burndown = jirareport.report.Burndown(sprint, commitment, report, issues, customfield)
     timeline = burndown.get_timeline()
+    velocity = commitment - timeline['completed'][-1]
 
+    click.echo('Velocity: %s ' % velocity)
     click.echo('Writing SVG to %s' % output.name)
 
     style = pygal.style.Style(
