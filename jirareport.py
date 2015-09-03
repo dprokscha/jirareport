@@ -18,7 +18,7 @@ def main(ctx, server, username, password, customfield):
     jira = jirareport.jira.connect(server, username, password)
 
     if not jira:
-        click.echo('Connection to %s failed' % server, err=True)
+        click.echo('Connection to {0} failed'.format(server), err=True)
         exit(1)
 
     obj = collections.namedtuple('Context', 'jira customfield')
@@ -44,7 +44,7 @@ def burndown(ctx, output=None):
         reportable = None
 
     if not reportable:
-        click.echo('There are no active or closed sprints for the given board ID %s.' % board)
+        click.echo('There are no active or closed sprints for the given board ID {0}.'.format(board))
         return
 
     click.secho('OK', fg='green')
@@ -57,13 +57,13 @@ def burndown(ctx, output=None):
     details.sort(key=lambda sprint: sprint['startDate'])
 
     for sprint in details:
-        click.echo('ID %s, Created: %s, Name: %s' % (sprint['id'], sprint['startDate'].strftime('%Y-%m-%d'), sprint['name']))
+        click.echo('ID {0}, Created: {1}, Name: {2}'.format(sprint['id'], sprint['startDate'].strftime('%Y-%m-%d'), sprint['name']))
 
     while True:
         id = click.prompt('Enter sprint ID', type=click.INT)
         if any(sprint['id'] == id for sprint in details):
             break
-        click.echo('Invalid sprint ID %s' % id)
+        click.echo('Invalid sprint ID {0}'.format(id))
 
     click.echo('Fetching sprint report: ', nl=False)
 
@@ -71,7 +71,7 @@ def burndown(ctx, output=None):
     report = jira.sprint_report(board, id)
 
     if not sprint or not report or not report.all:
-        click.echo('Nothing found for sprint ID %s' % id)
+        click.echo('Nothing found for sprint ID {0}'.format(id))
         return
 
     click.secho('OK', fg='green')
@@ -114,8 +114,8 @@ def burndown(ctx, output=None):
     timeline = burndown.get_timeline()
     velocity = commitment - timeline['completed'][-1]
 
-    click.echo('Velocity: %s ' % velocity)
-    click.echo('Writing SVG to %s' % output.name)
+    click.echo('Velocity: {0}'.format(velocity))
+    click.echo('Writing SVG to {0}'.format(output.name))
 
     style = pygal.style.Style(
         background='transparent',
@@ -131,7 +131,7 @@ def burndown(ctx, output=None):
         style=style,
         x_label_rotation=90
     )
-    chart.title = 'Burndown, %s' % sprint['name']
+    chart.title = 'Burndown, {0}'.format(sprint['name'])
     chart.x_title = 'Dates'
     chart.x_labels = timeline['dates']
     chart.y_title = 'Story Points'
@@ -156,7 +156,7 @@ def dailybusiness(ctx):
         issue = jira.issue(key)
 
     except Exception:
-        click.echo('Issue not found: %s' % key, err=True)
+        click.echo('Issue not found: {0}'.format(key), err=True)
         exit(1)
 
     length = 0
@@ -169,10 +169,10 @@ def dailybusiness(ctx):
     dailybusiness = jirareport.report.dailybusiness.analyse(issue.fields.comment.comments)
     average = jirareport.report.dailybusiness.average(length, dailybusiness['hours'], dailybusiness['minutes'])
 
-    click.echo('Found %dh %dm of daily business. Average per day: %dh %dm' % (dailybusiness['hours'],
-                                                                              dailybusiness['minutes'],
-                                                                              average['hours'],
-                                                                              average['minutes']))
+    click.echo('Found {0}h {1}m of daily business. Average per day: {2}h {3}m'.format(dailybusiness['hours'],
+                                                                                      dailybusiness['minutes'],
+                                                                                      average['hours'],
+                                                                                      average['minutes']))
 
     click.echo('Done!')
 
