@@ -117,7 +117,9 @@ def burndown(ctx, output=None):
     for key, message in burndown.faulty.items():
         click.echo('{0} is faulty: {1}'.format(key, message))
 
-    click.echo('Velocity: {0}'.format(velocity))
+    if 'CLOSED' == sprint['state']:
+        click.echo('Velocity: {0}'.format(velocity))
+
     click.echo('Writing SVG to {0}'.format(output.name))
 
     style = pygal.style.Style(
