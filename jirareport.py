@@ -114,6 +114,9 @@ def burndown(ctx, output=None):
     timeline = burndown.get_timeline()
     velocity = commitment - timeline['completed'][-1]
 
+    for key, message in burndown.faulty.items():
+        click.echo('{0} is faulty: {1}'.format(key, message))
+
     click.echo('Velocity: {0}'.format(velocity))
     click.echo('Writing SVG to {0}'.format(output.name))
 

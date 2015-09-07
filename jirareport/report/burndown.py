@@ -13,6 +13,7 @@ class Burndown():
         self.issues = issues
         self.timeline = collections.OrderedDict()
         self.customfield = customfield
+        self.faulty = {}
 
         self.start = datetime.datetime.strptime(sprint['startDate'], '%d/%b/%y %I:%M %p')
         self.end = datetime.datetime.strptime(sprint['endDate'], '%d/%b/%y %I:%M %p')
@@ -46,10 +47,14 @@ class Burndown():
             if not self.start <= resolution <= self.end:
                 continue
 
+            estimation = getattr(self.issues[key].fields, self.customfield)
+            if estimation is None:
+                self.faulty[key] = 'Estimation missing'
+
             change = resolution.strftime('%Y-%m-%d')
             if change not in changes:
                 changes[change] = 0
-            changes[change] += int(getattr(self.issues[key].fields, self.customfield, 0))
+            changes[change] += int(estimation or 0)
 
         # decreased story points
         for key in self.report.all:
@@ -73,8 +78,7 @@ class Burndown():
                         continue
 
                     if 'Story Points' == item.field and item.fromString is not None:
-
-                        diff = int(item.toString) - int(item.fromString)
+                        diff = int(item.toString or 0) - int(item.fromString or 0)
                         if diff > 0:
                             continue
 
@@ -114,12 +118,14 @@ class Burndown():
 
                 estimation = self._get_estimation_from_date(date, self.issues[key].changelog.histories)
                 if estimation is None:
-                    estimation = int(getattr(self.issues[key].fields, self.customfield, 0))
+                    estimation = getattr(self.issues[key].fields, self.customfield)
+                if estimation is None:
+                    self.faulty[key] = 'Estimation missing'
 
                 change = date.strftime('%Y-%m-%d')
                 if change not in changes:
                     changes[change] = 0
-                changes[change] += estimation
+                changes[change] += int(estimation or 0)
 
         # punted
         for key in self.report.punted:
@@ -135,12 +141,14 @@ class Burndown():
 
                 estimation = self._get_estimation_from_date(date, self.issues[key].changelog.histories)
                 if estimation is None:
-                    estimation = int(getattr(self.issues[key].fields, self.customfield, 0))
+                    estimation = getattr(self.issues[key].fields, self.customfield)
+                if estimation is None:
+                    self.faulty[key] = 'Estimation missing'
 
                 change = date.strftime('%Y-%m-%d')
                 if change not in changes:
                     changes[change] = 0
-                changes[change] -= estimation
+                changes[change] -= int(estimation or 0)
 
         # decreased/increased story points
         for key in self.report.all:
@@ -162,7 +170,7 @@ class Burndown():
 
                     if 'Story Points' == item.field and item.fromString is not None:
 
-                        diff = int(item.toString) - int(item.fromString)
+                        diff = int(item.toString or 0) - int(item.fromString or 0)
                         if 'Open' != status and diff < 0:
                             continue
 
