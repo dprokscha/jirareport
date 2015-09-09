@@ -3,6 +3,8 @@ import collections
 import click
 import pygal
 
+import jirareport.ask
+import jirareport.filter
 import jirareport.jira
 import jirareport.report
 
@@ -33,37 +35,13 @@ def burndown(ctx, output=None):
     jira = ctx.obj.jira
     customfield = ctx.obj.customfield
 
-    board = click.prompt('Enter board ID', type=click.INT)
-
-    click.echo('Verifying board ID: ', nl=False)
-
     try:
-        reportable = jira.reportable_sprints(board)
+        board, sprints = jirareport.ask.for_board(jira)
+        id = jirareport.ask.for_sprint(jira, board, sprints)
 
-    except Exception:
-        reportable = None
-
-    if not reportable:
-        click.echo('There are no active or closed sprints for the given board ID {0}.'.format(board))
-        return
-
-    click.secho('OK', fg='green')
-
-    details = []
-    with click.progressbar(reportable, bar_template='%(label)s [%(bar)s] %(info)s', label='Fetching sprints:', show_eta=False) as sprints:
-        for sprint in sprints:
-            details.append(jira.get_sprint(board, sprint.id))
-
-    details.sort(key=lambda sprint: sprint['startDate'])
-
-    for sprint in details:
-        click.echo('ID {0}, Created: {1}, Name: {2}'.format(sprint['id'], sprint['startDate'].strftime('%Y-%m-%d'), sprint['name']))
-
-    while True:
-        id = click.prompt('Enter sprint ID', type=click.INT)
-        if any(sprint['id'] == id for sprint in details):
-            break
-        click.echo('Invalid sprint ID {0}'.format(id))
+    except Exception as e:
+        click.secho(str(e), fg='red')
+        exit(1)
 
     click.echo('Fetching sprint report: ', nl=False)
 
@@ -71,43 +49,13 @@ def burndown(ctx, output=None):
     report = jira.sprint_report(board, id)
 
     if not sprint or not report or not report.all:
-        click.echo('Nothing found for sprint ID {0}'.format(id))
-        return
+        click.secho('Nothing found for sprint ID {0}'.format(id), fg='red')
+        exit(1)
 
     click.secho('OK', fg='green')
 
-    labels = []
-    if click.confirm('Filter issues for labels?'):
-        while True:
-            try:
-                labels.append(click.prompt('Enter label (interrupt to leave)', type=click.STRING))
-            except Exception:
-                break
-
-    issues = {}
-    ignored = []
-    with click.progressbar(report.all, bar_template='%(label)s [%(bar)s] %(info)s', label='Fetching issues:', show_eta=False) as all:
-        for key in all:
-
-            issue = jira.issue(key, expand='changelog')
-
-            if labels and not [label for label in labels if label in issue.fields.labels]:
-                ignored.append(key)
-                continue
-
-            issues[key] = issue
-
-    for key in ignored:
-        if key in report.completed:
-            report.completed.remove(key)
-        if key in report.incompleted:
-            report.incompleted.remove(key)
-        if key in report.added:
-            report.added.remove(key)
-        if key in report.punted:
-            report.punted.remove(key)
-        if key in report.all:
-            report.all.remove(key)
+    labels = jirareport.ask.for_labels()
+    issues, report = jirareport.filter.for_labels(jira, report, labels)
 
     commitment = click.prompt('Enter commitment', type=click.INT)
     burndown = jirareport.report.Burndown(sprint, commitment, report, issues, customfield)
