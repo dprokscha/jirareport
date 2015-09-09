@@ -20,23 +20,6 @@ def for_labels(jira, report, labels):
     for key in ignored:
         for collection in ['completed', 'incompleted', 'added', 'punted', 'all']:
             if key in getattr(report, collection):
-                print('sdf')
                 getattr(report, collection).remove(key)
 
     return (issues, report)
-
-
-
-"""
-    for key in ignored:
-        if key in report.completed:
-            report.completed.remove(key)
-        if key in report.incompleted:
-            report.incompleted.remove(key)
-        if key in report.added:
-            report.added.remove(key)
-        if key in report.punted:
-            report.punted.remove(key)
-        if key in report.all:
-            report.all.remove(key)
-"""
