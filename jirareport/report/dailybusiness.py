@@ -15,7 +15,6 @@ def analyse(sprint, issue):
             continue
 
         for track in tracks.findall(comment.body):
-
             minutes += int(track[0]) * 60
             minutes += int(track[1])
 
