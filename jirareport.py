@@ -103,29 +103,36 @@ def dailybusiness(ctx):
 
     jira = ctx.obj.jira
 
-    key = click.prompt('Enter issue key', type=click.STRING)
-
     try:
-        issue = jira.issue(key)
+        board, sprints = jirareport.ask.for_board(jira)
+        id = jirareport.ask.for_sprint(jira, board, sprints)
 
-    except Exception:
-        click.echo('Issue not found: {0}'.format(key), err=True)
+    except Exception as e:
+        click.secho(str(e), fg='red')
         exit(1)
 
-    length = 0
-    while length <= 0:
-        length = click.prompt('Enter sprint length', type=click.INT)
+    click.echo('Fetching sprint report: ', nl=False)
 
-        if length <= 0:
-            click.echo('Error: Invalid sprint length')
+    sprint = jira.sprint_info(board, id)
+    report = jira.sprint_report(board, id)
 
-    dailybusiness = jirareport.report.dailybusiness.analyse(issue.fields.comment.comments)
-    average = jirareport.report.dailybusiness.average(length, dailybusiness['hours'], dailybusiness['minutes'])
+    if not sprint or not report or not report.all:
+        click.secho('Nothing found for sprint ID {0}'.format(id), fg='red')
+        exit(1)
 
-    click.echo('Found {0}h {1}m of daily business. Average per day: {2}h {3}m'.format(dailybusiness['hours'],
-                                                                                      dailybusiness['minutes'],
-                                                                                      average['hours'],
-                                                                                      average['minutes']))
+    click.secho('OK', fg='green')
+
+    labels = jirareport.ask.for_labels()
+    issues, report = jirareport.filter.for_labels(jira, report, labels)
+
+    minutes = 0
+    with click.progressbar(report.all, bar_template='%(label)s [%(bar)s] %(info)s', label='Analysing time tracks:', show_eta=False) as all:
+        for key in all:
+            minutes += jirareport.report.dailybusiness.analyse(sprint, issues[key])
+
+    dailybusiness = jirareport.report.dailybusiness.format(minutes)
+
+    click.echo('Found {0}h {1}m of daily business.'.format(*dailybusiness))
 
     click.echo('Done!')
 
