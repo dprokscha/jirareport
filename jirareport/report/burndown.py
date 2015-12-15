@@ -62,7 +62,7 @@ class Burndown():
             if 'Story' != self.issues[key].fields.issuetype.name:
                 continue
 
-            status = 'Open'
+            status = self.issues[key].fields.status.name
 
             for history in self.issues[key].changelog.histories:
                 for item in history.items:
@@ -156,7 +156,7 @@ class Burndown():
             if 'Story' != self.issues[key].fields.issuetype.name:
                 continue
 
-            status = 'Open'
+            status = self.issues[key].fields.status.name
 
             for history in self.issues[key].changelog.histories:
                 for item in history.items:
