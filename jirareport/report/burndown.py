@@ -210,7 +210,7 @@ class Burndown():
 
                 created = datetime.datetime.strptime(re.sub(r'\..*$', '', history.created), '%Y-%m-%dT%H:%M:%S')
 
-                if 'Story Points' == item.field:
+                if 'Story Points' == item.field and item.toString:
 
                     if created <= date:
                         before = int(item.toString)
