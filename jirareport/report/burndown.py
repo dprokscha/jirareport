@@ -195,7 +195,7 @@ class Burndown():
                 if not (self.start <= created <= self.end):
                     continue
 
-                if 'Sprint' == item.field and str(self.sprint['id']) == item.to:
+                if 'Sprint' == item.field and str(self.sprint['id']) in str(item.to).replace(' ', '').split(','):
                     dates.append(created)
 
         return dates
