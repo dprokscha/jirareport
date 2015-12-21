@@ -9,10 +9,17 @@ class JIRA(JIRAHandler):
 
     def get_sprint(self, board_id, sprint_id):
 
-        r_json = self._get_json('sprint/%s' % sprint_id, base='{server}/rest/agile/1.0/{path}')
+        r_json = self._get_json(
+            'sprint/%s' % sprint_id,
+            base='{server}/rest/agile/1.0/{path}'
+            )
 
-        r_json['startDate'] = datetime.datetime.strptime(re.sub(r'\..*$', '', r_json['startDate']), '%Y-%m-%dT%H:%M:%S')
-        r_json['endDate'] = datetime.datetime.strptime(re.sub(r'\..*$', '', r_json['endDate']), '%Y-%m-%dT%H:%M:%S')
+        r_json['startDate'] = datetime.datetime.strptime(
+            re.sub(r'\..*$', '', r_json['startDate']), '%Y-%m-%dT%H:%M:%S'
+            )
+        r_json['endDate'] = datetime.datetime.strptime(
+            re.sub(r'\..*$', '', r_json['endDate']), '%Y-%m-%dT%H:%M:%S'
+            )
 
         return r_json
 
@@ -30,10 +37,15 @@ class JIRA(JIRAHandler):
 
     def sprint_report(self, board_id, sprint_id):
 
-        r_json = self._get_json('rapid/charts/sprintreport?rapidViewId=%s&sprintId=%s' % (board_id, sprint_id),
-                                base=self.AGILE_BASE_URL)
+        r_json = self._get_json(
+            'rapid/charts/sprintreport?rapidViewId=%s&sprintId=%s'
+            % (board_id, sprint_id),
+            base=self.AGILE_BASE_URL
+            )
 
-        issues = collections.namedtuple('Issues', 'completed incompleted added punted all')
+        issues = collections.namedtuple(
+            'Issues', 'completed incompleted added punted all'
+            )
 
         completed = []
         incompleted = []
@@ -46,7 +58,7 @@ class JIRA(JIRAHandler):
             if issue['key'] not in all:
                 all.append(issue['key'])
 
-        for issue in r_json['contents']['incompletedIssues']:
+        for issue in r_json['contents']['issuesNotCompletedInCurrentSprint']:
             incompleted.append(issue['key'])
             if issue['key'] not in all:
                 all.append(issue['key'])
