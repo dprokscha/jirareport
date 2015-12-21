@@ -9,17 +9,13 @@ class JIRA(JIRAHandler):
 
     def get_sprint(self, board_id, sprint_id):
 
-        r_json = self._get_json(
-            'sprint/%s' % sprint_id,
-            base='{server}/rest/agile/1.0/{path}'
-            )
+        r_json = self._get_json('sprint/%s' % sprint_id,
+                                base='{server}/rest/agile/1.0/{path}')
 
         r_json['startDate'] = datetime.datetime.strptime(
-            re.sub(r'\..*$', '', r_json['startDate']), '%Y-%m-%dT%H:%M:%S'
-            )
+            re.sub(r'\..*$', '', r_json['startDate']), '%Y-%m-%dT%H:%M:%S')
         r_json['endDate'] = datetime.datetime.strptime(
-            re.sub(r'\..*$', '', r_json['endDate']), '%Y-%m-%dT%H:%M:%S'
-            )
+            re.sub(r'\..*$', '', r_json['endDate']), '%Y-%m-%dT%H:%M:%S')
 
         return r_json
 
@@ -40,12 +36,10 @@ class JIRA(JIRAHandler):
         r_json = self._get_json(
             'rapid/charts/sprintreport?rapidViewId=%s&sprintId=%s'
             % (board_id, sprint_id),
-            base=self.AGILE_BASE_URL
-            )
+            base=self.AGILE_BASE_URL)
 
         issues = collections.namedtuple(
-            'Issues', 'completed incompleted added punted all'
-            )
+            'Issues', 'completed incompleted added punted all')
 
         completed = []
         incompleted = []
